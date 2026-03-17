@@ -35,10 +35,7 @@ async function sendToGemini(messages) {
     return aiMessage;
   } catch (err) {
     console.error("Gemini API error:", err?.response?.data || err);
-    return {
-      error: "Sorry, there was an error connecting to the AI.",
-      errorDetails: err.message,
-    };
+    return "I cannot access AI responses right now, but I can still book your appointment. Please say: book appointment.";
   }
 }
 
