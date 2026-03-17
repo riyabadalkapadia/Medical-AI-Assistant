@@ -73,7 +73,9 @@ const Home = () => {
     for (let i = newMessages.length - 1; i >= 0; i -= 1) {
       if (
         newMessages[i]?.role === "assistant" &&
-        String(newMessages[i]?.content || "").includes(APPOINTMENT_ANCHOR_PROMPT)
+        String(newMessages[i]?.content || "").includes(
+          APPOINTMENT_ANCHOR_PROMPT,
+        )
       ) {
         anchorIndex = i;
         break;
@@ -255,7 +257,7 @@ const Home = () => {
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} mx-3 animate-in fade-in slide-in-from-bottom-3 duration-300`}
             >
               <div
-                className={`max-w-[65%] px-3.5 py-2.5 rounded-xl text-sm leading-[1.5] break-words overflow-hidden ${
+                className={`text-left max-w-[65%] px-3.5 py-2.5 rounded-xl text-sm leading-[1.5] break-words overflow-hidden ${
                   msg.role === "user"
                     ? "bg-gradient-to-br from-teal-600 to-cyan-600 text-white shadow-sm"
                     : "bg-slate-700/70 text-slate-100 border border-slate-500/30 shadow-sm"
