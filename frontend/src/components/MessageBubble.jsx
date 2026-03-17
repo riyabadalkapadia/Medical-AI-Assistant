@@ -12,10 +12,15 @@ const MessageBubble = ({ message, isUser }) => {
       <div className="text-sm leading-relaxed whitespace-pre-line font-medium">
         {message}
       </div>
-      <div className={`text-xs mt-3 opacity-60 font-light ${
-        isUser ? 'text-cyan-100' : 'text-slate-400'
-      }`}>
-        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      <div
+        className={`text-xs mt-3 opacity-60 font-light ${
+          isUser ? "text-cyan-100" : "text-slate-400"
+        }`}
+      >
+        {new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       </div>
     </div>
   );

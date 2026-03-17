@@ -9,12 +9,15 @@ const playSound = (type) => {
   const now = audioContext.currentTime;
   const oscillator = audioContext.createOscillator();
   const gain = audioContext.createGain();
-  
+
   oscillator.connect(gain);
   gain.connect(audioContext.destination);
   oscillator.frequency.value = type === "sent" ? 700 : 900;
   gain.gain.setValueAtTime(0.3, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + (type === "sent" ? 0.1 : 0.15));
+  gain.gain.exponentialRampToValueAtTime(
+    0.01,
+    now + (type === "sent" ? 0.1 : 0.15),
+  );
   oscillator.start(now);
   oscillator.stop(now + (type === "sent" ? 0.1 : 0.15));
 };
@@ -23,7 +26,8 @@ const Home = () => {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Hello! I'm your Kyron Medical Assistant. How can I help you today?",
+      content:
+        "Hello! I'm your Kyron Medical Assistant. How can I help you today?",
       status: "read",
       timestamp: new Date(),
     },
@@ -52,7 +56,12 @@ const Home = () => {
 
     const newMessages = [
       ...messages,
-      { role: "user", content: input, status: "delivered", timestamp: new Date() },
+      {
+        role: "user",
+        content: input,
+        status: "delivered",
+        timestamp: new Date(),
+      },
     ];
 
     setMessages(newMessages);
@@ -64,8 +73,8 @@ const Home = () => {
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((msg, idx) =>
-          idx === prev.length - 1 ? { ...msg, status: "read" } : msg
-        )
+          idx === prev.length - 1 ? { ...msg, status: "read" } : msg,
+        ),
       );
     }, 500);
 
@@ -83,19 +92,35 @@ const Home = () => {
         if (res.ok) {
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: "📞 Phone call initiated! You should receive a call shortly.", status: "read", timestamp: new Date() },
+            {
+              role: "assistant",
+              content:
+                "📞 Phone call initiated! You should receive a call shortly.",
+              status: "read",
+              timestamp: new Date(),
+            },
           ]);
         } else {
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: `❌ Call failed: ${data.error || "Unknown error"}`, status: "read", timestamp: new Date() },
+            {
+              role: "assistant",
+              content: `❌ Call failed: ${data.error || "Unknown error"}`,
+              status: "read",
+              timestamp: new Date(),
+            },
           ]);
         }
       } catch (err) {
         playSound("received");
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "❌ Network error. Please try again.", status: "read", timestamp: new Date() },
+          {
+            role: "assistant",
+            content: "❌ Network error. Please try again.",
+            status: "read",
+            timestamp: new Date(),
+          },
         ]);
       }
     } else {
@@ -109,13 +134,23 @@ const Home = () => {
         playSound("received");
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: data.message, status: "read", timestamp: new Date() },
+          {
+            role: "assistant",
+            content: data.message,
+            status: "read",
+            timestamp: new Date(),
+          },
         ]);
       } catch (err) {
         playSound("received");
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "Sorry, something went wrong. Please try again.", status: "read", timestamp: new Date() },
+          {
+            role: "assistant",
+            content: "Sorry, something went wrong. Please try again.",
+            status: "read",
+            timestamp: new Date(),
+          },
         ]);
       }
     }
@@ -125,13 +160,21 @@ const Home = () => {
   };
 
   const startPhoneCall = async () => {
-    const phone = messages.find((m) => m.role === "user" && m.content.match(/\d{7,}/));
+    const phone = messages.find(
+      (m) => m.role === "user" && m.content.match(/\d{7,}/),
+    );
     const phoneNumber = phone ? phone.content.match(/\d{7,}/)[0] : null;
 
     if (!phoneNumber) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Please provide your phone number first (e.g., '1234567890')", status: "read", timestamp: new Date() },
+        {
+          role: "assistant",
+          content:
+            "Please provide your phone number first (e.g., '1234567890')",
+          status: "read",
+          timestamp: new Date(),
+        },
       ]);
       return;
     }
@@ -149,19 +192,35 @@ const Home = () => {
       if (res.ok) {
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "📞 Phone call initiated! You should receive a call shortly.", status: "read", timestamp: new Date() },
+          {
+            role: "assistant",
+            content:
+              "📞 Phone call initiated! You should receive a call shortly.",
+            status: "read",
+            timestamp: new Date(),
+          },
         ]);
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: `❌ Call failed: ${data.error || "Unknown error"}`, status: "read", timestamp: new Date() },
+          {
+            role: "assistant",
+            content: `❌ Call failed: ${data.error || "Unknown error"}`,
+            status: "read",
+            timestamp: new Date(),
+          },
         ]);
       }
     } catch (err) {
       playSound("received");
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "❌ Network error. Please try again.", status: "read", timestamp: new Date() },
+        {
+          role: "assistant",
+          content: "❌ Network error. Please try again.",
+          status: "read",
+          timestamp: new Date(),
+        },
       ]);
     }
     setLoading(false);
@@ -173,7 +232,7 @@ const Home = () => {
       <div className="w-full max-w-2xl h-[85vh] bg-gradient-to-br from-slate-800/50 via-slate-850/50 to-slate-900/60 rounded-none shadow-xl flex flex-col border border-slate-600/30 backdrop-blur-2xl overflow-hidden relative">
         {/* Premium gradient overlay effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
-        
+
         {/* WhatsApp-style Header */}
         <div className="relative bg-gradient-to-r from-slate-800/80 via-slate-800/70 to-slate-800/80 backdrop-blur-xl border-b border-slate-600/20 text-white px-6 py-4 flex items-center justify-between flex-shrink-0 shadow-lg">
           <div className="flex items-center gap-4">
@@ -183,14 +242,20 @@ const Home = () => {
             </div>
             <div>
               <h2 className="font-bold text-lg leading-tight">Kyron Medical</h2>
-              <p className={`text-xs font-semibold transition-colors duration-300 ${isTyping ? "text-amber-400" : "text-teal-300"}`}>
+              <p
+                className={`text-xs font-semibold transition-colors duration-300 ${isTyping ? "text-amber-400" : "text-teal-300"}`}
+              >
                 {isTyping ? "typing..." : "Online"}
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="p-2.5 rounded-full hover:bg-slate-700/40 transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/20 text-lg">☎️</button>
-            <button className="p-2.5 rounded-full hover:bg-slate-700/40 transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/20 text-lg">⋮</button>
+            <button className="p-2.5 rounded-full hover:bg-slate-700/40 transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/20 text-lg">
+              ☎️
+            </button>
+            <button className="p-2.5 rounded-full hover:bg-slate-700/40 transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/20 text-lg">
+              ⋮
+            </button>
           </div>
         </div>
 
@@ -198,7 +263,8 @@ const Home = () => {
         <div
           className="flex-1 overflow-y-auto px-5 py-4 space-y-3 scroll-smooth"
           style={{
-            backgroundImage: "linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(2, 20, 36, 0.3) 100%)",
+            backgroundImage:
+              "linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(2, 20, 36, 0.3) 100%)",
           }}
         >
           {messages.map((msg, idx) => (
@@ -213,17 +279,28 @@ const Home = () => {
                     : "bg-slate-700/70 text-slate-100 border border-slate-500/30 shadow-sm"
                 }`}
               >
-                <p className="font-normal leading-[1.5] break-words overflow-wrap-anywhere">{msg.content}</p>
+                <p className="font-normal leading-[1.5] break-words overflow-wrap-anywhere">
+                  {msg.content}
+                </p>
                 <div
                   className={`flex items-center gap-2 mt-2.5 text-xs font-medium ${
                     msg.role === "user" ? "opacity-85" : "opacity-70"
                   }`}
                 >
-                  <span className="text-opacity-75">{msg.timestamp?.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className="text-opacity-75">
+                    {msg.timestamp?.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                   {msg.role === "user" && (
                     <span className="ml-1 font-semibold text-opacity-90">
-                      {msg.status === "delivered" && <span className="inline-block">✓</span>}
-                      {msg.status === "read" && <span className="inline-block">✓✓</span>}
+                      {msg.status === "delivered" && (
+                        <span className="inline-block">✓</span>
+                      )}
+                      {msg.status === "read" && (
+                        <span className="inline-block">✓✓</span>
+                      )}
                     </span>
                   )}
                 </div>
@@ -257,7 +334,13 @@ const Home = () => {
 
         {/* Input Area - Premium WhatsApp Style */}
         <div className="relative bg-gradient-to-t from-slate-800/90 via-slate-800/80 to-slate-800/70 backdrop-blur-xl border-t border-slate-600/20 px-5 py-5 flex-shrink-0 shadow-lg">
-          <InputBox value={input} onChange={(e) => setInput(e.target.value)} onSend={handleSend} onCall={startPhoneCall} disabled={loading} />
+          <InputBox
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onSend={handleSend}
+            onCall={startPhoneCall}
+            disabled={loading}
+          />
         </div>
       </div>
     </div>
