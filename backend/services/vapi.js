@@ -4,8 +4,10 @@ const axios = require("axios");
 
 const VAPI_API_KEY = process.env.VAPI_API_KEY;
 const VAPI_ASSISTANT_ID = process.env.VAPI_ASSISTANT_ID;
-const VAPI_PHONE_NUMBER_ID =
-  process.env.VAPI_PHONE_NUMBER_ID || "f5165447-1d40-4613-8fef-6677b916fe36"; // Default fallback
+const VAPI_CALL_PHONE_NUMBER_ID =
+  process.env.VAPI_CALL_PHONE_NUMBER_ID ||
+  process.env.VAPI_PHONE_NUMBER_ID ||
+  "f5165447-1d40-4613-8fef-6677b916fe36"; // Backward-compatible fallback
 
 async function startVapiCall(phoneNumber) {
   if (!VAPI_API_KEY || !VAPI_ASSISTANT_ID) {
@@ -36,13 +38,13 @@ async function startVapiCall(phoneNumber) {
   };
   const body = {
     assistantId: VAPI_ASSISTANT_ID,
-    phoneNumberId: VAPI_PHONE_NUMBER_ID,
+    phoneNumberId: VAPI_CALL_PHONE_NUMBER_ID,
     customer: { number: formattedPhoneNumber },
   };
 
   console.log("Making Vapi call with:", {
     assistantId: VAPI_ASSISTANT_ID,
-    phoneNumberId: VAPI_PHONE_NUMBER_ID,
+    phoneNumberId: VAPI_CALL_PHONE_NUMBER_ID,
     customerNumber: formattedPhoneNumber,
   });
 
