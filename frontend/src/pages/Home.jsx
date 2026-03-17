@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import InputBox from "../components/InputBox";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const APPOINTMENT_ANCHOR_PROMPT = "First Name?";
 
 // Play notification sound
 const playSound = (type) => {
@@ -51,8 +52,6 @@ const Home = () => {
     if (!input.trim()) return;
 
     playSound("sent");
-    const phoneMatch = input.match(/\d{7,}/);
-    const hasPhone = phoneMatch !== null;
 
     const newMessages = [
       ...messages,
@@ -69,6 +68,23 @@ const Home = () => {
     setLoading(true);
     setIsTyping(true);
 
+    // Keep enough context for flow state while still bounding payload size.
+    let anchorIndex = -1;
+    for (let i = newMessages.length - 1; i >= 0; i -= 1) {
+      if (
+        newMessages[i]?.role === "assistant" &&
+        String(newMessages[i]?.content || "").includes(APPOINTMENT_ANCHOR_PROMPT)
+      ) {
+        anchorIndex = i;
+        break;
+      }
+    }
+
+    const contextMessages =
+      anchorIndex >= 0
+        ? newMessages.slice(Math.max(0, anchorIndex - 1))
+        : newMessages.slice(-20);
+
     // Simulate delivery status update
     setTimeout(() => {
       setMessages((prev) =>
@@ -78,61 +94,16 @@ const Home = () => {
       );
     }, 500);
 
-    if (hasPhone) {
-      const phoneNumber = phoneMatch[0];
-      try {
-        const res = await fetch(`${BACKEND_URL}/start-call`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phoneNumber }),
-        });
-        const data = await res.json();
-        playSound("received");
-
-        if (res.ok) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content:
-                "📞 Phone call initiated! You should receive a call shortly.",
-              status: "read",
-              timestamp: new Date(),
-            },
-          ]);
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content: `❌ Call failed: ${data.error || "Unknown error"}`,
-              status: "read",
-              timestamp: new Date(),
-            },
-          ]);
-        }
-      } catch (err) {
-        playSound("received");
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "❌ Network error. Please try again.",
-            status: "read",
-            timestamp: new Date(),
-          },
-        ]);
-      }
-    } else {
-      try {
-        const res = await fetch(`${BACKEND_URL}/chat`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: newMessages }),
-        });
-        const data = await res.json();
-        playSound("received");
-        setMessages((prev) => [
+    try {
+      const res = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: contextMessages }),
+      });
+      const data = await res.json();
+      playSound("received");
+      setMessages((prev) => {
+        const nextMessages = [
           ...prev,
           {
             role: "assistant",
@@ -140,19 +111,30 @@ const Home = () => {
             status: "read",
             timestamp: new Date(),
           },
-        ]);
-      } catch (err) {
-        playSound("received");
-        setMessages((prev) => [
-          ...prev,
-          {
+        ];
+
+        if (data.followUpMessage) {
+          nextMessages.push({
             role: "assistant",
-            content: "Sorry, something went wrong. Please try again.",
+            content: data.followUpMessage,
             status: "read",
             timestamp: new Date(),
-          },
-        ]);
-      }
+          });
+        }
+
+        return nextMessages;
+      });
+    } catch {
+      playSound("received");
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, something went wrong. Please try again.",
+          status: "read",
+          timestamp: new Date(),
+        },
+      ]);
     }
 
     setLoading(false);
@@ -211,7 +193,7 @@ const Home = () => {
           },
         ]);
       }
-    } catch (err) {
+    } catch {
       playSound("received");
       setMessages((prev) => [
         ...prev,

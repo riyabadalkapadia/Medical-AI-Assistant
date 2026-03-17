@@ -18,7 +18,12 @@ const doctors = [
     name: "Dr. Patel",
     specialty: "Cardiology",
     bodyPart: "heart",
-    availability: ["2026-03-21 14:00"],
+    availability: [
+      "2026-03-20 09:30",
+      "2026-03-20 14:00",
+      "2026-03-23 11:00",
+      "2026-03-24 15:00",
+    ],
   },
   {
     name: "Dr. Adams",

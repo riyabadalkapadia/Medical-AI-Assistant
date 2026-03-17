@@ -15,7 +15,7 @@ const InputBox = ({ value, onChange, onSend, onCall, disabled }) => {
         <input
           className="flex-1 px-3 py-3.5 bg-transparent text-slate-100 placeholder-slate-500 outline-none text-sm font-normal caret-cyan-400"
           type="text"
-          placeholder="Type your message or phone number..."
+          placeholder="Type your message..."
           value={value}
           onChange={onChange}
           disabled={disabled}
