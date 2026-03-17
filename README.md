@@ -28,3 +28,11 @@ A minimal full-stack MVP for a virtual medical receptionist using React, Vite, T
 ## Setup Instructions
 
 See below for setup and run instructions for both frontend and backend.
+
+cd .\backend\
+set env variables
+npm start
+
+
+cd .\frontend\
+npm run dev
